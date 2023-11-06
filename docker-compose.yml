@@ -1,0 +1,32 @@
+version: '3.7'
+
+services:
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mydatabase
+    ports:
+      - "5432:5432"
+
+  backend:
+    build: ./cook_unity_back
+    ports:
+      - "4000:4000"
+    environment:
+      DATABASE_URL: postgresql://user:password@db:5432/mydatabase?schema=public
+      JWT_KEY_USERS: b7dDf9E91JQaZt6Ht5Rbe4rndJGTkNhv4p2Ce7Mz9mzA8Kt3W5zGcH4E9f7Yp4tR
+      JWT_KEY_INTERNS: b7dDf9E91JQaZt6Ht5Rbe4rndJGTkNhv4p2Ce7Mz9mzA8Kt3W5zGcH4E9f7Yp4tR_INTERNS
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: ./cook_unity_front
+      args:
+        REACT_APP_SERVER_URL: http://localhost:4000
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend

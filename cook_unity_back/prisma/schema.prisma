@@ -1,0 +1,54 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model chef {
+  username   String   @id @map("username")
+  hash       String   @map("hash")
+  salt       String   @map("salt")
+  meals      meal[]
+  created_at DateTime? @map("created_at") @default(now())
+
+  @@map("chef")
+}
+
+model meal {
+  id            Int         @id @default(autoincrement()) @map("id")
+  name          String      @map("name")
+  description   String      @map("description")
+  chef_username String      @map("chef_username")
+  chef          chef        @relation(fields: [chef_username], references: [username])
+  user_meals    user_meal[]
+  created_at DateTime?    @map("created_at") @default(now())
+
+  @@map("meal")
+}
+
+model user {
+  username   String      @id @map("username")
+  hash       String      @map("hash")
+  salt       String      @map("salt")
+  created_at DateTime?    @map("created_at") @default(now())
+  user_meals user_meal[]
+
+  @@map("user")
+}
+
+model user_meal {
+  id            Int    @id @default(autoincrement()) @map("id") 
+  user_username String @map("user_username")
+  meal_id       Int    @map("meal_id")
+  rating        Int?   @map("rating")
+  user          user   @relation(fields: [user_username], references: [username])
+  meal          meal   @relation(fields: [meal_id], references: [id])
+  created_at DateTime?    @map("created_at") @default(now())
+
+  @@map("user_meal")
+}

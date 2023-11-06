@@ -1,0 +1,35 @@
+# Use the official lightweight Node.js 16 image.
+# https://hub.docker.com/_/node
+FROM node:16-alpine
+
+# Create and change to the app directory.
+WORKDIR /usr/src/app
+
+# Copy application dependency manifests to the container image.
+COPY package*.json ./
+
+# Install production dependencies.
+RUN npm ci --only=production
+
+# Install Prisma CLI to run migrations and generate the Prisma client
+RUN npm install prisma --save-dev
+
+# If you require global packages such as the NestJS CLI, install them here.
+RUN npm install -g @nestjs/cli
+
+# Rebuild all the native modules
+RUN apk add --no-cache --virtual .gyp python3 make g++ && \
+    npm rebuild bcrypt --build-from-source && \
+    apk del .gyp
+
+# Copy local code to the container image.
+COPY . .
+
+# Generate the Prisma client
+RUN npx prisma generate
+
+# Expose the port the app runs on.
+EXPOSE 4000
+
+# Run Prisma migrations and start the application.
+CMD ["sh", "-c", "npx prisma migrate deploy && npm start"]
