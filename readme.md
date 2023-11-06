@@ -20,3 +20,7 @@ Install Node.js, npm/yarn, and set up a Postgres database.
 - **Swagger UI**: [http://localhost:4000/api-docs#/](http://localhost:4000/api-docs#/)
 - **Backend API**: [http://localhost:4000/](http://localhost:4000/)
 - **Frontend App**: [http://localhost:3000/](http://localhost:3000/)
+
+## Notes
+
+- **Database schemas**: Luna Modeler was used to generate the database schemas. The files are located in the `database` directory.
